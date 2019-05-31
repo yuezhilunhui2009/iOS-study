@@ -407,7 +407,7 @@ int main (int argc, const char *argv[]) {
 
 代码解读
 
-* `id shapes[3]`：其中 `id` 是范型，表示可以接受任意类型对象，实际上是一个指针
+* `id shapes[3]`：其中 `id` 是泛型，表示可以接受任意类型对象，实际上是一个指针
 * `[shape draw]`：在 OC 中叫做向 shape 对象发送 draw 消息，在其他 OOP 语言中也叫做调用 shape 对象的 draw 方法。这里并不仅仅是叫法不同，而内部实现也不同，OC 中是向对象发送消息，然后运行时查找是否在类中定义过此函数，然后再执行
 
     ![](assets/WX20190531-005046@2x.png)
@@ -429,7 +429,7 @@ OC 相关的一些术语：
 在 OC 中看到 `@` 前缀通常情况都是对 C 语言的扩展，可以认为是 OC 新增特性
 
 ```Objective-C
-// @interface 编译器指令，表示接口定义开始
+// @interface 编译器指令，表示接口定义开始，创建一个类之前编译器需要知道一个类的相关信息
 // Circle : NSObject 冒号表示继承，在 OC 中所有的类都继承自 NSObject
 @interface Circle : NSObject
 // 实例变量声明
@@ -458,8 +458,12 @@ OC 相关的一些术语：
 @interface 用于定义公共接口，而真正使对象运行起来的代码在 @implementation 部分
 
 ```Objective-C
+// @implementation 是编译器指令，表示将为某个类提供实现代码
+// Circle 是类名
 @implementation Circle
 
+// bounds 是 @interface 部分定义过的成员，所以方法参数改名为 _bounds 以免冲突
+// OC 在调用方法时会将对象以 self 隐藏参数形式传递给方法，bounds 即 self.bounds
 - (void) setBounds: (ShapeRect) _bounds {
     bounds = _bounds;
 };
@@ -471,9 +475,28 @@ OC 相关的一些术语：
 - (void) draw {
     NSLog(@"绘制一个 (%d %d %d %d) %@色的圆",
           bounds.x, bounds.y,
-          bounds.width,bounds.height,
+          bounds.width, bounds.height,
           colorName(fillColor));
 }
 
 @end
+```
+
+### 3.4.3 实例化对象
+通过类创建对象的过程叫实例化（instantiation），实例化对象时需要分配内存，这些内存被分配并保存了一些默认值之后就形成了对象实例。
+
+对象的局部变量也称作实例变量，通常简写为 `ivars`。
+
+OC 中可以向类发送消息，创建实例时向类发送 new 消息，该类接收到并处理完 new 消息后，我们就会得到一个可以使用的新对象实例。
+
+```Objective-C
+id shapes[3];
+
+ShapeRect rect0 = { 0, 0, 10, 30 };
+
+// 实例化 circle 对象
+// 向 Circle 类发送 new 消息
+shapes[0] = [Circle new];
+[shapes[0] setBounds: rect0];
+[shapes[0] setFillColor: kRedColor];
 ```
