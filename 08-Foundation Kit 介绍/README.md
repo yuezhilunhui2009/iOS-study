@@ -146,6 +146,171 @@ int main(int argc, const char * argv[]) {
 
 ## 8.2 字符串
 ### 8.2.1 创建字符串
+使用 `NSString` 的 `stringWithFormat` 方法创建格式化字符串，方法签名：
+`+ (id) stringWithFormat: (NSString *) format, ...;`
+
+代码 ios-study-08-02：
+```Objective-C
+#import <Foundation/Foundation.h>
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        // ===================
+        // 使用 stringWithFormat 创建字符串
+        // ===================
+        NSString *str;
+        str = [NSString stringWithFormat: @"北京今天的天气晴朗，温度 %d ~ %d 摄氏度", 24, 32];
+        NSLog(@"%@", str);
+    }
+    return 0;
+}
+```
+
+程序运行输出：
+```
+2019-06-06 14:23:44.796761+0800 ios-study-08-02[52395:20514398] 北京今天的天气晴朗，温度 24 ~ 32 摄氏度
+```
+
+### 8.2.2 类方法
+`+ (id) stringWithFormat: (NSString *) format, ...;` 的加号代表此方法为类方法（有的语言叫做静态方法），后面的点点点代表可以传入多个参数。
+
+### 8.2.3 关于大小
+`NSString` 实例的 `length` 方法可以返回字符串长度，它可以处理多种语言例如英文、中文、俄文甚至 unicode 编码的字符串等等。
+
+代码 ios-study-08-02：
+```Objective-C
+#import <Foundation/Foundation.h>
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        // ===================
+        // 计算字符串长度
+        // ===================
+        NSString *strChinese;
+        strChinese = [NSString stringWithFormat: @"中文字符串"];
+        NSLog(@"strChinese 字符串长度 => %lul", [strChinese length]);
+        
+        NSString *strEnglish;
+        strEnglish = [NSString stringWithFormat: @"english string"];
+        NSLog(@"strEnglish 字符串长度 => %lul", [strEnglish length]);
+    }
+    return 0;
+}
+```
+
+程序运行输出：
+```
+2019-06-06 14:32:23.610741+0800 ios-study-08-02[54232:20523532] strChinese 字符串长度 => 5l
+2019-06-06 14:32:23.610755+0800 ios-study-08-02[54232:20523532] strEnglish 字符串长度 => 14l
+```
+
+### 8.2.4 比较的策略
+`NSString` 实例的 `isEqualToString` 方法用来比较自身和传入字符串是否相等（用 `==` 来比较两个字符串的指针是否相等的方式对比字符串是否相等是错误的），方法签名：
+`- (BOOL) isEqualToString: (NSString *) aString;`
+
+`NSString` 实例的 `compare` 方法用来逐个字符比较两个字符串大小，返回结果是 `NSComparisonResult` 枚举：
+```Objective-C
+// 比较结果枚举：
+typedef enum _NSComparisonResult {
+    NSOrderedAscending = -1;
+    NSOrderedSame,
+    NSOrderedDescending
+} NSComparisonResult;
+```
+
+代码 ios-study-08-02：
+```Objective-C
+#import <Foundation/Foundation.h>
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        // ===================
+        // 比较字符串是否相等
+        // ===================
+        NSString *str1 = @"用于比较的字符串";
+        NSString *str2 = @"用于比较的字符串";
+        NSString *str3;
+        str3 = [NSString stringWithFormat: @"用于比较的字符串"];
+
+        NSLog(@"str1 和 str2 指针是否相等 => %d", str1 == str2);
+        NSLog(@"str2 和 str3 指针是否相等 => %d", str2 == str3);
+        NSLog(@"str1 和 str1 内容是否相等 => %hhd", [str1 isEqualToString: str2]);
+        NSLog(@"str2 和 str3 内容是否相等 => %hhd", [str2 isEqualToString: str3]);
+
+        // ===================
+        // 比较字符串大小
+        // ===================
+        NSString *str4 = @"111";
+        NSString *str5 = @"222";
+        NSString *str6 = @"222";
+        
+        NSLog(@"str4 compare str5 => %ld", (long)[str4 compare: str5]);
+        NSLog(@"str5 compare str6 => %ld", (long)[str5 compare: str6]);
+        NSLog(@"str6 compare str4 => %ld", (long)[str6 compare: str4]);
+    }
+    return 0;
+}
+```
+
+程序运行输出：
+```
+2019-06-06 15:21:40.900828+0800 ios-study-08-02[63663:20571793] str1 和 str2 指针是否相等 => 1
+2019-06-06 15:21:40.900837+0800 ios-study-08-02[63663:20571793] str2 和 str3 指针是否相等 => 0
+2019-06-06 15:21:40.900847+0800 ios-study-08-02[63663:20571793] str1 和 str1 内容是否相等 => 1
+2019-06-06 15:21:40.900863+0800 ios-study-08-02[63663:20571793] str2 和 str3 内容是否相等 => 1
+
+2019-06-06 15:21:40.900874+0800 ios-study-08-02[63663:20571793] str4 compare str5 => -1
+2019-06-06 15:21:40.900883+0800 ios-study-08-02[63663:20571793] str5 compare str6 => 0
+2019-06-06 15:21:40.900890+0800 ios-study-08-02[63663:20571793] str6 compare str4 => 1
+```
+
+### 8.2.5 不区分大小写的比较
+`compare:` 是区分大小写的比较，还有一个不区分大小写的比较方法 `compare: options:`，方法签名：
+`- (NSComparisonResult) compare: (NSString *) string options: (unsigned) mask;`。
+
+`options` 是位掩码，可以使用位或（`|`）来添加选项标记，常用的选项：
+```
+NSCaseInsensitiveSearch: 不区分大小写字符
+NSLiteralSearch: 进行完全比较，区分大小写
+NSNumbericSearch: 比较字符串字符个数
+```
+
+代码 ios-study-08-02：
+```Objective-C
+#import <Foundation/Foundation.h>
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        // ===================
+        // 比较字符串大小（忽略大小写）
+        // ===================
+        NSString *str7 = @"ABC";
+        NSString *str8 = @"abc";
+        
+        NSLog(@"str7 compare str8 忽略大小写 => %ld", [str7 compare: str8 options: NSCaseInsensitiveSearch]);
+        NSLog(@"str7 compare str8 区分大小写 => %ld", [str7 compare: str8 options: NSLiteralSearch]);
+    }
+    return 0;
+}
+```
+
+程序运行输出：
+```
+2019-06-06 16:13:35.205982+0800 ios-study-08-02[73855:20621281] str7 compare str8 忽略大小写 => 0
+2019-06-06 16:13:35.205994+0800 ios-study-08-02[73855:20621281] str7 compare str8 区分大小写 => -1
+```
+
+### 8.2.6 字符串内是否还包含别的字符串
+```Objective-C
+// 判断是否为字符串开头
+- (BOOL) hasPrefix: (NSString *) aString;
+
+// 判断是否为字符串结尾
+- (BOOL) hasSuffix: (NSString *) aString;
+
+// 返回传入字符串在当前字符串中的范围
+- (NSRange) rangeOfString: (NSString *) aString;
+```
 
 ## 8.3 可变性
 
